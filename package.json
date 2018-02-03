@@ -22,5 +22,17 @@
   "license": "MIT",
   "dependencies": {
     "@bowtie/utils": "^0.1.0"
-  }
+  },
+  "directories": {
+    "test": "test"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bowtie-co/node-api.git"
+  },
+  "bugs": {
+    "url": "https://github.com/bowtie-co/node-api/issues"
+  },
+  "homepage": "https://github.com/bowtie-co/node-api#readme"
 }
