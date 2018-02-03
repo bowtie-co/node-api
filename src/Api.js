@@ -100,17 +100,7 @@ class Api {
     } else if (this.settings.authorization === 'Bearer') {
       const { token } = args;
 
-      if (typeof token === 'function') {
-        this.token = token();
-      } else {
-        this.token = token;
-      }
-    }
-
-    if (this.isAuthorized()) {
-      this.settings.defaultOptions.headers = Object.assign(this.settings.defaultOptions.headers, {
-        Authorization: `${this.settings.authorization} ${this.token}`
-      });
+      this.token = token;
     }
   }
 
@@ -168,6 +158,14 @@ class Api {
     return new Promise(
       // Promise format using resolve and reject functions
       (resolve, reject) => {
+        if (this.isAuthorized()) {
+          const authToken = typeof this.token === 'function' ? this.token() : this.token;
+
+          this.settings.defaultOptions.headers = Object.assign(this.settings.defaultOptions.headers, {
+            Authorization: `${this.settings.authorization} ${authToken}`
+          });
+        }
+
         // Debug
         this._debug('Calling route:', path);
         
