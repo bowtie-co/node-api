@@ -3,8 +3,14 @@
   "version": "0.0.1",
   "description": "A simple class to standardize API interactions",
   "main": "index.js",
+  "engines": {
+    "node": ">=6.x"
+  },
   "scripts": {
-    "test": "npm test"
+    "test": "mocha test/**/*.spec.js",
+    "test:watch": "mocha test/**/*.spec.js --watch",
+    "preversion": "npm test",
+    "postversion": "git push --follow-tags"
   },
   "keywords": [
     "bowtie",
@@ -26,7 +32,10 @@
   "directories": {
     "test": "test"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "mocha": "^5.0.0"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/bowtie-co/node-api.git"
