@@ -1,6 +1,6 @@
 {
   "name": "@bowtie/api",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A simple class to standardize API interactions",
   "main": "index.js",
   "engines": {
