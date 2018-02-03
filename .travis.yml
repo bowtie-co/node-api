@@ -1,6 +1,8 @@
 language: node_js
 node_js:
 - 8
+before_script:
+  - npm run build
 deploy:
   provider: npm
   email: charlie@bowtie.co
