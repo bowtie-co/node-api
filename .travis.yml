@@ -1,0 +1,11 @@
+language: node_js
+node_js:
+- 8
+deploy:
+  provider: npm
+  email: charlie@bowtie.co
+  on:
+    tags: true
+    repo: bowtie-co/node-api
+  api_key:
+    secure: k1MooLA9plSBkIflxoprni1c0DPgxUZqzkZht/AkKT4CjGUTN/TiQ5F6N5tuAlpa0U23bjL4QGUxdkaQE9xT/c9g74wf4GLCzT1TthPueDyAQ7q9NDLlIeIN1SZsW9j8Nha8N75BLu2vMJdj8DBt9LT8jqwgEaiP0AjshE/OM6SyBItrc9Y0T13wlrTlAI8DmBwfqiEbhGlsP0rZ0lL1u/AAscM8z/NphsfRr0koS/ED4q2Vclx+gH5s3vb/MsyRX6XGE5hwPsuiLGV39tYVTTblVrMoKKISQciy7ucS9V+xLqtjNTuZF7DKVaOY3+RnmHn2PNA2161u1yD1Z69f4dXAUo95uA1J1qLlfWj1RGiItIds0dLtyE+4O8ylT4Tqk+j62POmYuGY3YoyMNuJHvoQj+5KzgWvs7f/Uu8Is5rRz6jsWZ8IX230wt7j3us7cUkHlhwS9D4TnBFcYBNHNNpjagk6b1GVPCPb2qJ6vd8qB1NBBUxJgkYlFkt1UicmMd2DURpsJJ7Ai1iMkl617fMlx9xu/JydaCuCxtP0PhWrv1aTRRAb8QXKnVAFIFwHL0saNni9hLlwMVJSYkPbgDXaXiuqG478g3UsHJPuZmOAtb54NxoJayMHyK4lToWmDWYIRYgQ9EDqMrGgzGvY3Es6jRlpbFVG5C+64hdg3nY=
