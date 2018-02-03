@@ -8,7 +8,7 @@
   },
   "scripts": {
     "build": "babel src -d lib --presets env",
-    "test": "mocha test/**/*.spec.js",
+    "test": "npm run build && mocha test/**/*.spec.js",
     "test:watch": "mocha test/**/*.spec.js --watch",
     "preversion": "npm test",
     "postversion": "git push --follow-tags"
