@@ -1,0 +1,26 @@
+{
+  "name": "@bowtie/api",
+  "version": "0.0.1",
+  "description": "A simple class to standardize API interactions",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm test"
+  },
+  "keywords": [
+    "bowtie",
+    "api",
+    "base",
+    "fetch",
+    "async",
+    "get",
+    "post",
+    "put",
+    "delete",
+    "rest"
+  ],
+  "author": "Bowtie",
+  "license": "MIT",
+  "dependencies": {
+    "@bowtie/utils": "^0.1.0"
+  }
+}
