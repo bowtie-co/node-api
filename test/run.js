@@ -1,6 +1,6 @@
-const BowtieApi = require('../');
+const Api = require('../');
 
-const myApi = new BowtieApi({
+const myApi = new Api({
   root: 'something'
 });
 

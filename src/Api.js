@@ -24,7 +24,7 @@ const defaults = {
 /**
  * Api class to handle all interactions with backend
  */
-class BowtieApi {
+class Api {
   /**
    * Constructor for an Api object
    */
@@ -234,4 +234,4 @@ class BowtieApi {
   }
 }
 
-module.exports = BowtieApi;
+module.exports = Api;

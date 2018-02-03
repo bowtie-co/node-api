@@ -1,1 +1,1 @@
-module.exports = require('./src/BowtieApi');
+module.exports = require('./src/Api');
