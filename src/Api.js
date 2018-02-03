@@ -95,11 +95,16 @@ class Api {
 
   authorize(args) {
     if (this.settings.authorization === 'Basic') {
-      const { user, pass } = args;
-      this.token = btoa(`${user}:${pass}`);
+      const { username, password } = args;
+      this.token = btoa(`${username}:${password}`);
     } else if (this.settings.authorization === 'Bearer') {
       const { token } = args;
-      this.token = token;
+
+      if (typeof token === 'function') {
+        this.token = token();
+      } else {
+        this.token = token;
+      }
     }
 
     if (this.isAuthorized()) {
