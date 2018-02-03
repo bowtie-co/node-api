@@ -28,7 +28,7 @@
   "author": "Bowtie",
   "license": "MIT",
   "dependencies": {
-    "@bowtie/utils": "^0.1.4"
+    "@bowtie/utils": "^0.1.6"
   },
   "directories": {
     "test": "test"

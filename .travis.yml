@@ -4,6 +4,7 @@ node_js:
 deploy:
   provider: npm
   email: charlie@bowtie.co
+  skip_cleanup: true
   on:
     tags: true
     repo: bowtie-co/node-api
