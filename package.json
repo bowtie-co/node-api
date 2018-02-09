@@ -8,7 +8,7 @@
   },
   "scripts": {
     "build": "babel src -d lib --presets env",
-    "test": "npm run build && mocha test/**/*.spec.js",
+    "test": "standard && npm run build && mocha test/**/*.spec.js",
     "test:watch": "mocha test/**/*.spec.js --watch",
     "preversion": "npm test",
     "postversion": "git push --follow-tags"
@@ -40,7 +40,8 @@
     "babel-preset-env": "^1.6.1",
     "chai": "^4.1.2",
     "mocha": "^5.0.0",
-    "node-localstorage": "^1.3.0"
+    "node-localstorage": "^1.3.0",
+    "standard": "*"
   },
   "repository": {
     "type": "git",
