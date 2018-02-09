@@ -10,8 +10,9 @@ const defaults = {
   authorization: 'None',
   defaultOptions: {
     method: 'GET',
-    headers: {},
-    body: {}
+    headers: {
+      'Content-Type': 'application/json'
+    }
   }
 };
 
@@ -41,6 +42,16 @@ class Api {
   }
 
   init() {
+    this.isNode = require('detect-node');
+
+    if (this.isNode) {
+      this.fetch = require('node-fetch');
+    } else if (window && window.fetch && typeof window.fetch === 'function') {
+      this.fetch = window.fetch.bind(window);
+    } else {
+      throw new Error('Unable to load fetch');
+    }
+
     // Root domain for the API (MUST be over HTTPS)
     this.root = this.settings.root;
 
@@ -89,18 +100,49 @@ class Api {
     this.settings.authorization = capitalizeWord(this.settings.authorization);
   }
 
+  hasValidToken() {
+    const token = this.varOrFn(this.token) || null;
+
+    return token && token.trim() !== '';
+  }
+
   isAuthorized() {
-    return (this.settings.authorization !== 'None' && this.token);
+    return (this.settings.authorization !== 'None' && this.hasValidToken());
+  }
+
+  base64encode(str) {
+    if (this.isNode) {
+      return new Buffer(str).toString('base64');
+    } else if (typeof btoa === 'function') {
+      return btoa(str);
+    }
+  }
+
+  base64decode(b64, format='utf8') {
+    if (this.isNode) {
+      return new Buffer(b64, 'base64').toString(format);
+    } else if (typeof atob === 'function'){
+      return atob(b64);
+    }
+  }
+
+  varOrFn(arg) {
+    if (typeof arg === 'function') {
+      return arg();
+    } else {
+      return arg;
+    }
   }
 
   authorize(args) {
-    if (this.settings.authorization === 'Basic') {
-      const { username, password } = args;
-      this.token = btoa(`${username}:${password}`);
-    } else if (this.settings.authorization === 'Bearer') {
-      const { token } = args;
-
-      this.token = token;
+    if (args.token) {
+      this.token = args.token;
+    } else if (this.settings.authorization === 'Basic' && args.username && args.password) {
+      this.token = () => {
+        return this.base64encode(`${this.varOrFn(args.username)}:${this.varOrFn(args.password)}`)
+      };
+    } else {
+      throw new Error('Invalid args to authorize()');
     }
   }
 
@@ -115,8 +157,7 @@ class Api {
       authorization: 'string',
       defaultOptions: {
         method: 'string',
-        headers: 'object',
-        body: 'object'
+        headers: 'object'
       }
     };
 
@@ -158,25 +199,26 @@ class Api {
     return new Promise(
       // Promise format using resolve and reject functions
       (resolve, reject) => {
-        if (this.isAuthorized()) {
-          const authToken = typeof this.token === 'function' ? this.token() : this.token;
-
-          this.settings.defaultOptions.headers = Object.assign(this.settings.defaultOptions.headers, {
-            Authorization: `${this.settings.authorization} ${authToken}`
-          });
-        }
-
         // Debug
         this._debug('Calling route:', path);
         
         // Merge options provided to this method with the default options for this API instance
         const callOptions = Object.assign({}, this.settings.defaultOptions, options);
+
+        if (this.isAuthorized()) {
+          callOptions.headers.Authorization = `${this.settings.authorization} ${this.varOrFn(this.token)}`
+        }
+
         this._debug("callOptions: ", callOptions);
         
         // Call fetch for the full request URL (using buildUrl function and merged callOptions object)
-        fetch(this.buildUrl(path), callOptions)
+        this.fetch(this.buildUrl(path), callOptions)
           // Convert response body to JSON (should trigger catch if fails)
-          .then(response => response.json())
+          .then(response => {
+            // this._debug(response);
+
+            return response.json()
+          })
 
           // After converting to JSON, resolve the callRoute() Promise with the returned data
           .then(data => {

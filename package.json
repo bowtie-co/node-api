@@ -28,7 +28,9 @@
   "author": "Bowtie",
   "license": "MIT",
   "dependencies": {
-    "@bowtie/utils": "^0.1.6"
+    "@bowtie/utils": "^0.1.6",
+    "detect-node": "^2.0.3",
+    "node-fetch": "^2.0.0"
   },
   "directories": {
     "test": "test"
@@ -37,7 +39,8 @@
     "babel-cli": "^6.26.0",
     "babel-preset-env": "^1.6.1",
     "chai": "^4.1.2",
-    "mocha": "^5.0.0"
+    "mocha": "^5.0.0",
+    "node-localstorage": "^1.3.0"
   },
   "repository": {
     "type": "git",
