@@ -23,3 +23,5 @@ npm install --save @bowtie/api
 ```
 
 ## Usage
+
+[Documentation](https://bowtie-co.github.io/node-api)
