@@ -7,11 +7,14 @@
     "node": ">=6.x"
   },
   "scripts": {
-    "doc": "./node_modules/jsdoc/jsdoc.js src/* -d docs -r README.md && git add docs && git commit -m 'Generated Docs'",
+    "doc": "jsdoc --configure .jsdoc.json --verbose",
+    "doc:commit": "npm run doc && git add docs && git commit -m 'Generated Docs'",
     "build": "babel src -d lib --presets env",
-    "test": "standard && npm run build && mocha test/**/*.spec.js",
+    "lint": "standard",
+    "lint:fix": "standard --fix",
+    "test": "npm run lint && npm run build && mocha test/**/*.spec.js",
     "test:watch": "mocha test/**/*.spec.js --watch",
-    "preversion": "npm test && npm run doc",
+    "preversion": "npm test && npm run doc:commit",
     "postversion": "git push --follow-tags"
   },
   "keywords": [
@@ -46,6 +49,7 @@
     "babel-preset-env": "^1.6.1",
     "chai": "^4.1.2",
     "jsdoc": "^3.5.5",
+    "minami": "^1.2.3",
     "mocha": "^5.0.0",
     "node-localstorage": "^1.3.0",
     "standard": "*"

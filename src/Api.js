@@ -2,6 +2,35 @@
 
 const { capitalizeWord, verifyRequired } = require('@bowtie/utils')
 
+/**
+  @typedef ApiHeaders
+  @type {object}
+  @property {string} [Content-Type=application/json] - Content-Type header. Defaults to 'application/json'
+  @property {string} [Authorization] - Optional authorization header(s). Can be set using {@link Api#authorize}
+*/
+
+/**
+  @typedef FetchOptions
+  @type {object}
+  @property {string} [method=GET] - HTTP method for fetch request(s). Defaults to 'GET'
+  @property {ApiHeaders} [headers] - HTTP headers for fetch requests(s).
+  @property {object} [body] - HTTP request payload
+*/
+
+/**
+  @typedef ApiSettings
+  @type {object}
+  @property {string} root - Root url/domain for this API
+  @property {string} [stage] - API stage (useful for API's built on serverless)
+  @property {string} [prefix] - API prefix (i.e. "api")
+  @property {string} [version] - API version (i.e. "v1")
+  @property {boolean} [verbose=false] - Enable debug logs
+  @property {boolean} [secureOnly=true] - Enforce HTTPS API
+  @property {string} [authorization='None'] - Authorization type ('Basic' or 'Bearer')
+  @property {FetchOptions} [defaultOptions] - Default options to be used for every fetch call
+*/
+
+/** @type {ApiSettings} */
 const defaults = {
   root: null,
   stage: null,
@@ -31,18 +60,7 @@ class Api {
   /**
    * Constructor for an Api object
    * @constructor
-   * @param {object} settings - Settings to create api instance
-   * @param {string} settings.root - Root url/domain for this API
-   * @param {string} settings.stage - API stage (useful for API's built on serverless)
-   * @param {string} settings.prefix - API prefix (i.e. "api")
-   * @param {string} settings.version - API version (i.e. "v1")
-   * @param {boolean} [settings.verbose=false] - Flag to enable debug logs
-   * @param {boolean} [settings.secureOnly=true] - Require HTTPS API
-   * @param {string} [settings.authorization='None'] - Auth type
-   * @param {object} settings.defaultOptions
-   * @param {string} [settings.defaultOptions.method='GET']
-   * @param {object} settings.defaultOptions.headers
-   * @param {string} [settings.defaultOptions.headers['Content-Type']='application/json']
+   * @param {ApiSettings} settings - Settings to create api instance
    */
   constructor (settings) {
     this.settings = Object.assign({}, defaults, settings)
@@ -50,30 +68,41 @@ class Api {
     // Validate this API instance
     this.validate()
 
+    // Initialize this API instance
     this.init()
 
     // Sanitize all API variables for this API instance
     this.sanitize()
   }
 
+  /**
+   * Initialize API instance
+   * @throws {Error} Unable to load fetch library via NodeJS or window.fetch
+   */
   init () {
+    // Use detect-node package to determine if usage is NodeJS or browser
     this.isNode = require('detect-node')
 
+    // If NodeJS, use node-fetch package as fetch library
     if (this.isNode) {
       this.fetch = require('node-fetch')
+
+    // If browser, verify window.fetch exists as function and use as fetch library
     } else if (window && window.fetch && typeof window.fetch === 'function') {
       this.fetch = window.fetch.bind(window)
+
+    // Unable to determine fetch library to use
     } else {
       throw new Error('Unable to load fetch')
     }
 
-    // Root domain for the API (MUST be over HTTPS)
+    // Root domain for the API
     this.root = this.settings.root
 
-    // API stage (dev only for now)
+    // API stage
     this.stage = this.settings.stage
 
-    // API path prefix (shouldn't change)
+    // API path prefix
     this.prefix = this.settings.prefix
 
     // API version (in case future versions are released, this is easy to change)
@@ -82,6 +111,7 @@ class Api {
 
   /**
    * Sanitize all API variables for this API instance
+   * @throws {Error} API root must be HTTPS if secureOnly is true in the {@link ApiSettings}
    */
   sanitize () {
     // Split the root member variable on '://' (to ensure protocol exists or we can add it)
@@ -112,19 +142,35 @@ class Api {
     if (this.prefix) this.prefix = this.prefix.replace(/\//g, '')
     if (this.version) this.version = this.version.replace(/\//g, '')
 
+    // Ensure authorization string is capitalized
     this.settings.authorization = capitalizeWord(this.settings.authorization)
   }
 
+  /**
+   * Check if this API instance has a valid token
+   * @returns {boolean} - Whether or not this API instance has a valid token
+   */
   hasValidToken () {
     const token = this.varOrFn(this.token) || null
 
     return token && token.trim() !== ''
   }
 
+  /**
+   * Check if this API instance is authorized
+   * @returns {boolean} - If this API instance has `settings.authorization` set and a valid token
+   */
   isAuthorized () {
     return (this.settings.authorization !== 'None' && this.hasValidToken())
   }
 
+  /**
+   * Encode given string as base64
+   * @example <caption>Example usage of base64encode.</caption>
+   * api.base64encode('aGVsbG8gd29ybGQ='); // returns 'hello world'
+   * @param {string} str - Input string to be encoded
+   * @returns {string} - Returns base64 encoded string
+   */
   base64encode (str) {
     if (this.isNode) {
       return Buffer.from(str).toString('base64')
@@ -133,6 +179,14 @@ class Api {
     }
   }
 
+  /**
+   * Decode given base64 string
+   * @example <caption>Example usage of base64decode.</caption>
+   * api.base64encode('hello world'); // returns 'aGVsbG8gd29ybGQ='
+   * @param {string} b64 - Base64 string to be decoded
+   * @param {string} [format='utf8'] - Target format for decoded string
+   * @returns {string} - Returns base64 decoded string
+   */
   base64decode (b64, format = 'utf8') {
     if (this.isNode) {
       return Buffer.from(b64, 'base64').toString(format)
@@ -141,14 +195,31 @@ class Api {
     }
   }
 
-  varOrFn (arg) {
-    if (typeof arg === 'function') {
-      return arg()
+  /**
+   * If ref is a function, execute with optional params.
+   * Otherwise, return value of ref
+   * @param {*} ref
+   * @param {...*} args
+   * @returns {*} - Return value of ref(...args) or ref
+   */
+  varOrFn (ref, ...args) {
+    if (typeof ref === 'function') {
+      return ref(...args)
     } else {
-      return arg
+      return ref
     }
   }
 
+  /**
+   * Authorize this API. If token is provided, it will be used for authorization.
+   * If username/password are provided, `settings.authorization` must be set to 'Basic',
+   * and a token will be generated using {@link Api#base64encode} with input: `${username}:${password}`
+   * @param {object} args
+   * @param {string|function} [args.token] - A token string, or a function to obtain a token value
+   * @param {string|function} [args.username] - A username string, or a function to obtain a username value
+   * @param {string|function} [args.password] - A password string, or a function to obtain a password value
+   * @throws {Error} - Arguments MUST provide token OR username & password
+   */
   authorize (args) {
     if (args.token) {
       this.token = args.token
@@ -163,6 +234,7 @@ class Api {
 
   /**
    * Validate this API instance
+   * @throws {Error} - If required schema is invalid
    */
   validate () {
     const schema = {
@@ -181,6 +253,7 @@ class Api {
 
   /**
    * Construct the base URL for this API (using other member variables)
+   * @returns {string} - Returns the constructed BaseUrl (root + stage + prefix + version)
    */
   baseUrl () {
     let baseUrl = this.root
@@ -194,6 +267,8 @@ class Api {
 
   /**
    * Build a request URL for a specific path
+   * @param {string} path - Build full request url for path
+   * @returns {string} - Fully constructed request url
    */
   buildUrl (path) {
     // If the path begins with a slash, remove the slash (since the baseUrl function ends with slash already)
@@ -206,8 +281,13 @@ class Api {
   }
 
   /**
-   * Generic request execution method
-   *    For a GET request, only the "path" parameter is required
+   * Generic request execution method. For a GET request, only the "path" parameter is required
+   * @async
+   * @param {object} args - Arguments to call api route
+   * @param {string} args.path - Relative api path to fetch
+   * @param {FetchOptions} [args.options] - Additional fetch options (will be assigned on top of {@link defaults})
+   * @param {object} [args.params] - Query string parameters
+   * @returns {Promise<object>} - Returns promise with response data
    */
   callRoute ({ path, options = {}, params = {} }) {
     // Return a promise so we can handle async requests in the components
@@ -252,12 +332,21 @@ class Api {
 
   /**
    * Helper for simple GET requests (only need to call "api.get('something')")
+   * @async
+   * @returns {Promise<object>} - Returns promise with response data
    */
   get (path) {
     // Return the result (Promise) of callRoute() with the provided path
     return this.callRoute({ path })
   }
 
+  /**
+   * Query API route for `path` using the POST method with a body
+   * @async
+   * @param {string} path - Request path
+   * @param {object} [body] - Request payload
+   * @returns {Promise<object>} - Returns promise with response data
+   */
   post (path, body = {}) {
     const options = {
       method: 'POST',
@@ -268,6 +357,13 @@ class Api {
     return this.callRoute({ path, options })
   }
 
+  /**
+   * Query API route for `path` using the PUT method with a body
+   * @async
+   * @param {string} path - Request path
+   * @param {object} [body] - Request payload
+   * @returns {Promise<object>} - Returns promise with response data
+   */
   put (path, body = {}) {
     const options = {
       method: 'PUT',
@@ -278,6 +374,13 @@ class Api {
     return this.callRoute({ path, options })
   }
 
+  /**
+   * Query API route for `path` using the DELETE method with a body
+   * @async
+   * @param {string} path - Request path
+   * @param {object} [body] - Request payload
+   * @returns {Promise<object>} - Returns promise with response data
+   */
   delete (path, body = {}) {
     const options = {
       method: 'DELETE'
@@ -287,6 +390,10 @@ class Api {
     return this.callRoute({ path, options })
   }
 
+  /**
+   * Console log all arguments if verbose setting is true
+   * @param {...*} args - All args passed to console.log
+   */
   _debug () {
     if (this.settings.verbose) {
       console.log(...arguments)
