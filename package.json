@@ -28,6 +28,11 @@
   ],
   "author": "Bowtie",
   "license": "MIT",
+  "standard": {
+    "ignore": [
+      "docs/*"
+    ]
+  },
   "dependencies": {
     "@bowtie/utils": "^0.1.6",
     "detect-node": "^2.0.3",
