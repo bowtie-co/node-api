@@ -1,11 +1,99 @@
 /* eslint-env mocha */
 
-const expect = require('chai').expect
+const chai = require('chai');
+const sinon = require('sinon')
+const { expect } = chai;
 const Api = require('../')
 
+chai.use(require('sinon-chai'));
+
 describe('Api', function () {
+  const root = 'https://api.example.com';
+
   it('should exist', function () {
     expect(Api).to.be.a('function')
+  })
+
+  describe('#get', function() {
+    const api = new Api({
+      root
+    })
+
+    sinon.stub(api, "fetch").resolves({ json: () => { data: 'stuff' } })
+
+    it('should call fetch GET', function() {
+      return api.get('path').then((data) => {
+        expect(api.fetch).to.have.been.calledWithExactly(`${root}/path`, { method: 'GET', headers: { 'Content-Type': 'application/json' }})
+        expect(api.fetch).to.have.been.calledOnce
+      })
+    })
+  })
+
+  describe('#post', function() {
+    const api = new Api({
+      root
+    })
+
+    sinon.stub(api, "fetch").resolves({ json: () => { data: 'stuff' } })
+
+    it('should call fetch POST', function() {
+      const body = {
+        data: 'body'
+      }
+
+      return api.post('path', body).then((data) => {
+        const options = {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(body)
+        }
+        expect(api.fetch).to.have.been.calledWithExactly(`${root}/path`, options)
+        expect(api.fetch).to.have.been.calledOnce
+      })
+    })
+  })
+
+  describe('#put', function() {
+    const api = new Api({
+      root
+    })
+
+    sinon.stub(api, "fetch").resolves({ json: () => { data: 'stuff' } })
+
+    it('should call fetch PUT', function() {
+      const body = {
+        data: 'body'
+      }
+
+      return api.put('path', body).then((data) => {
+        const options = {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(body)
+        }
+        expect(api.fetch).to.have.been.calledWithExactly(`${root}/path`, options)
+        expect(api.fetch).to.have.been.calledOnce
+      })
+    })
+  })
+
+  describe('#delete', function() {
+    const api = new Api({
+      root
+    })
+
+    sinon.stub(api, "fetch").resolves({ json: () => { data: 'stuff' } })
+
+    it('should call fetch DELETE', function() {
+      return api.delete('path').then((data) => {
+        expect(api.fetch).to.have.been.calledWithExactly(`${root}/path`, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }})
+        expect(api.fetch).to.have.been.calledOnce
+      })
+    })
   })
 
   it('should throw if missing required settings', function () {
