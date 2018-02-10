@@ -61,9 +61,100 @@
 <h1>@bowtie/api</h1><p>JavaScript utilities and helpers</p>
 <ul>
 <li><a href="#installation">Installation</a></li>
-<li><a href="#usage">Usage</a></li>
+<li><a href="#documentation">Documentation</a></li>
+<li><a href="#basic-usage">Basic Usage</a><ul>
+<li><a href="#get-example">GET Example</a></li>
+<li><a href="#post-example">POST Example</a></li>
+<li><a href="#put-example">PUT Example</a></li>
+<li><a href="#delete-example">DELETE Example</a></li>
 </ul>
-<h2>Installation</h2><pre class="prettyprint source lang-bash"><code>npm install --save @bowtie/api</code></pre><h2>Usage</h2><p><a href="https://bowtie-co.github.io/node-api">Documentation</a></p></article>
+</li>
+<li><a href="#base-url-config">Base URL Config</a></li>
+<li><a href="#authorization">Authorization</a><ul>
+<li><a href="#basic-auth">Basic Auth</a></li>
+<li><a href="#bearer-token">Bearer Token</a></li>
+</ul>
+</li>
+<li><a href="#ignore-security">Ignore Security</a></li>
+<li><a href="#enable-debug-logs">Enable Debug Logs</a></li>
+</ul>
+<h2>Installation</h2><pre class="prettyprint source lang-bash"><code>npm install --save @bowtie/api</code></pre><h2>Documentation</h2><p><a href="https://bowtie-co.github.io/node-api">Documentation</a></p>
+<h2>Basic Usage</h2><pre class="prettyprint source lang-javascript"><code>// Require @bowtie/api class definition
+const Api = require('@bowtie/api')
+
+// Create api instance
+const api = new Api({
+  root: 'api.example.com' // Will default to https:// if no protocol is provided here
+})</code></pre><h4>GET Example</h4><pre class="prettyprint source lang-javascript"><code>// REST GET /todos - Get all todos
+api.get('todos')
+  .then(resp => {
+    // resp = response from GET https://api.example.com/todos
+  })
+  .catch(err => {
+    // Something went wrong
+  })</code></pre><h4>POST Example</h4><pre class="prettyprint source lang-javascript"><code>// REST POST /todos - Create new todo
+api.post('todos', { name: 'new todo' })
+  .then(resp => {
+    // resp = response from POST https://api.example.com/todos
+  })
+  .catch(err => {
+    // Something went wrong
+  })</code></pre><h4>PUT Example</h4><pre class="prettyprint source lang-javascript"><code>// REST PUT /todos/1 - Update todo with id=1
+api.put('todos/1', { name: 'changed name' })
+  .then(resp => {
+    // resp = response from PUT https://api.example.com/todos/1
+  })
+  .catch(err => {
+    // Something went wrong
+  })</code></pre><h4>DELETE Example</h4><pre class="prettyprint source lang-javascript"><code>// REST DELETE /todos/1 - Delete todo with id=1
+api.delete('todos/1')
+  .then(resp => {
+    // resp = response from DELETE https://api.example.com/todos/1
+  })
+  .catch(err => {
+    // Something went wrong
+  })</code></pre><h2>Base URL Config</h2><pre class="prettyprint source lang-javascript"><code>// Create api instance
+const api = new Api({
+  root: 'api.example.com', // Set beginning of the baseUrl to https://api.example.com
+  stage: 'test',           // Append &quot;/test&quot; to baseUrl (i.e. https://api.example.com/test)
+  prefix: 'api',           // Append &quot;/api&quot; to baseUrl  (i.e. https://api.example.com/test/api)
+  version: 'v1'            // Append &quot;/v1&quot; to baseUrl   (i.e. https://api.example.com/test/api/v1)
+})
+
+// baseUrl is constructed as follows: (only api.root is required, any combination of stage/prefix/version is allowed)
+baseUrl = `${api.root}/${api.stage}/${api.prefix}/${api.version}`;</code></pre><h2>Authorization</h2><h4>Basic Auth</h4><pre class="prettyprint source lang-javascript"><code>// Create api instance
+const api = new Api({
+  root: 'api.example.com', // Will default to https:// if no protocol is provided here
+  authorization: 'Basic'   // Specify authorization type for this api
+})
+
+// Authorize api for basic auth with username & password
+api.authorize({
+  username: 'user',
+  password: 'pass'
+})</code></pre><h4>Bearer Token</h4><pre class="prettyprint source lang-javascript"><code>// Create api instance
+const api = new Api({
+  root: 'api.example.com', // Will default to https:// if no protocol is provided here
+  authorization: 'Bearer'  // Specify authorization type for this api
+})
+
+// Authorize with static token value
+api.authorize({
+  token: 'abc123'
+})
+
+// Authorize with dynamic token function
+api.authorize({
+  token: () => localStorage.getItem('access_token')
+})</code></pre><h2>Ignore security</h2><pre class="prettyprint source lang-javascript"><code>// Create api instance
+const api = new Api({
+  root: 'http://localhost:3000', // Use a local development API over HTTP (not secure HTTPS)
+  secureOnly: false              // Disable secure HTTPS requirement
+})</code></pre><h2>Enable Debug logs</h2><pre class="prettyprint source lang-javascript"><code>// Create api instance
+const api = new Api({
+  root: 'api.example.com', // Will default to https:// if no protocol is provided here
+  verbose: true            // Set verbose=true to enable debug log output
+})</code></pre></article>
     </section>
 
 
@@ -76,7 +167,7 @@
 <br class="clear">
 
 <footer>
-    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Feb 10 2018 14:53:31 GMT-0700 (MST) using the Minami theme.
+    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Feb 10 2018 15:28:59 GMT-0700 (MST) using the Minami theme.
 </footer>
 
 <script>prettyPrint();</script>
