@@ -1,42 +1,55 @@
 /* eslint-env mocha */
 
-const chai = require('chai');
+const chai = require('chai')
 const sinon = require('sinon')
-const { expect } = chai;
+const { expect } = chai
 const Api = require('../')
 
-chai.use(require('sinon-chai'));
+chai.use(require('sinon-chai'))
 
 describe('Api', function () {
-  const root = 'https://api.example.com';
+  const root = 'https://api.example.com'
 
   it('should exist', function () {
     expect(Api).to.be.a('function')
   })
 
-  describe('#get', function() {
+  describe('#get', function () {
     const api = new Api({
       root
     })
 
-    sinon.stub(api, "fetch").resolves({ json: () => { data: 'stuff' } })
+    sinon.stub(api, 'fetch').resolves({
+      json: () => {
+        return { data: 'stuff' }
+      }
+    })
 
-    it('should call fetch GET', function() {
+    it('should call fetch GET', function () {
       return api.get('path').then((data) => {
-        expect(api.fetch).to.have.been.calledWithExactly(`${root}/path`, { method: 'GET', headers: { 'Content-Type': 'application/json' }})
-        expect(api.fetch).to.have.been.calledOnce
+        const options = {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+        expect(api.fetch).to.have.been.calledWithExactly(`${root}/path`, options)
       })
     })
   })
 
-  describe('#post', function() {
+  describe('#post', function () {
     const api = new Api({
       root
     })
 
-    sinon.stub(api, "fetch").resolves({ json: () => { data: 'stuff' } })
+    sinon.stub(api, 'fetch').resolves({
+      json: () => {
+        return { data: 'stuff' }
+      }
+    })
 
-    it('should call fetch POST', function() {
+    it('should call fetch POST', function () {
       const body = {
         data: 'body'
       }
@@ -50,19 +63,22 @@ describe('Api', function () {
           body: JSON.stringify(body)
         }
         expect(api.fetch).to.have.been.calledWithExactly(`${root}/path`, options)
-        expect(api.fetch).to.have.been.calledOnce
       })
     })
   })
 
-  describe('#put', function() {
+  describe('#put', function () {
     const api = new Api({
       root
     })
 
-    sinon.stub(api, "fetch").resolves({ json: () => { data: 'stuff' } })
+    sinon.stub(api, 'fetch').resolves({
+      json: () => {
+        return { data: 'stuff' }
+      }
+    })
 
-    it('should call fetch PUT', function() {
+    it('should call fetch PUT', function () {
       const body = {
         data: 'body'
       }
@@ -76,22 +92,30 @@ describe('Api', function () {
           body: JSON.stringify(body)
         }
         expect(api.fetch).to.have.been.calledWithExactly(`${root}/path`, options)
-        expect(api.fetch).to.have.been.calledOnce
       })
     })
   })
 
-  describe('#delete', function() {
+  describe('#delete', function () {
     const api = new Api({
       root
     })
 
-    sinon.stub(api, "fetch").resolves({ json: () => { data: 'stuff' } })
+    sinon.stub(api, 'fetch').resolves({
+      json: () => {
+        return { data: 'stuff' }
+      }
+    })
 
-    it('should call fetch DELETE', function() {
+    it('should call fetch DELETE', function () {
       return api.delete('path').then((data) => {
-        expect(api.fetch).to.have.been.calledWithExactly(`${root}/path`, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }})
-        expect(api.fetch).to.have.been.calledOnce
+        const options = {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+        expect(api.fetch).to.have.been.calledWithExactly(`${root}/path`, options)
       })
     })
   })

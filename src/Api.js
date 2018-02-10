@@ -333,6 +333,16 @@ class Api {
   /**
    * Helper for simple GET requests (only need to call "api.get('something')")
    * @async
+   * @example <caption>Example usage of get.</caption>
+   * var api = new Api({ root: 'api.example.com' })
+   *
+   * api.get('todos')
+   *   .then(resp => {
+   *     // resp = response from GET https://api.example.com/todos
+   *   })
+   *   .catch(err => {
+   *     // Something went wrong
+   *   })
    * @returns {Promise<object>} - Returns promise with response data
    */
   get (path) {
@@ -343,6 +353,22 @@ class Api {
   /**
    * Query API route for `path` using the POST method with a body
    * @async
+   * @example <caption>Example usage of post.</caption>
+   * var api = new Api({ root: 'api.example.com' })
+   *
+   * var payload = {
+   *   todo: {
+   *     name: 'foobar'
+   *   }
+   * }
+   *
+   * api.post('todos', payload)
+   *   .then(resp => {
+   *     // resp = response from POST https://api.example.com/todos
+   *   })
+   *   .catch(err => {
+   *     // Something went wrong
+   *   })
    * @param {string} path - Request path
    * @param {object} [body] - Request payload
    * @returns {Promise<object>} - Returns promise with response data
@@ -360,6 +386,22 @@ class Api {
   /**
    * Query API route for `path` using the PUT method with a body
    * @async
+   * @example <caption>Example usage of put.</caption>
+   * var api = new Api({ root: 'api.example.com' })
+   *
+   * var payload = {
+   *   todo: {
+   *     name: 'new name'
+   *   }
+   * }
+   *
+   * api.put('todos/1', payload)
+   *   .then(resp => {
+   *     // resp = response from PUT https://api.example.com/todos/1
+   *   })
+   *   .catch(err => {
+   *     // Something went wrong
+   *   })
    * @param {string} path - Request path
    * @param {object} [body] - Request payload
    * @returns {Promise<object>} - Returns promise with response data
@@ -377,6 +419,16 @@ class Api {
   /**
    * Query API route for `path` using the DELETE method with a body
    * @async
+   * @example <caption>Example usage of delete.</caption>
+   * var api = new Api({ root: 'api.example.com' })
+   *
+   * api.delete('todos/1')
+   *   .then(resp => {
+   *     // resp = response from DELETE https://api.example.com/todos/1
+   *   })
+   *   .catch(err => {
+   *     // Something went wrong
+   *   })
    * @param {string} path - Request path
    * @param {object} [body] - Request payload
    * @returns {Promise<object>} - Returns promise with response data
