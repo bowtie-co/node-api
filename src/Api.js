@@ -316,14 +316,14 @@ class Api extends EventEmitter {
             this._debug(response)
 
             return response.json().then(data => {
-              this.emit(response.status.toString(), data, response);
+              this.emit(response.status.toString(), data, response)
 
               if (/2\d\d/.test(response.status)) {
                 this.emit('success', data, response)
               } else {
                 this.emit('error', data, response)
               }
-              
+
               return data
             })
           })
