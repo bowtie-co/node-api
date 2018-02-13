@@ -315,26 +315,19 @@ class Api extends EventEmitter {
           .then(response => {
             this._debug(response)
 
-            return response.json().then(data => {
-              this.emit(response.status.toString(), data, response)
+            this.emit(response.status.toString(), response)
 
-              if (/2\d\d/.test(response.status)) {
-                this.emit('success', data, response)
-              } else {
-                this.emit('error', data, response)
-              }
+            if (/2\d\d/.test(response.status)) {
+              this.emit('success', response)
+            } else {
+              this.emit('error', response)
+            }
 
-              return data
-            })
-          })
-
-          // After converting to JSON, resolve the callRoute() Promise with the returned data
-          .then(data => {
-            // Debug
-            this._debug('Response data', data)
-
-            // Resolve promise
-            resolve(data)
+            if (response.ok) {
+              resolve(response)
+            } else {
+              reject(response)
+            }
           })
 
           // Catch fetch error and reject the Promise

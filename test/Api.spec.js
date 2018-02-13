@@ -20,6 +20,7 @@ describe('Api', function () {
     })
 
     sinon.stub(api, 'fetch').resolves({
+      ok: true,
       status: 200,
       json: () => {
         return Promise.resolve({ data: 'stuff' })
@@ -45,6 +46,7 @@ describe('Api', function () {
     })
 
     sinon.stub(api, 'fetch').resolves({
+      ok: true,
       status: 200,
       json: () => {
         return Promise.resolve({ data: 'stuff' })
@@ -75,6 +77,7 @@ describe('Api', function () {
     })
 
     sinon.stub(api, 'fetch').resolves({
+      ok: true,
       status: 200,
       json: () => {
         return Promise.resolve({ data: 'stuff' })
@@ -105,6 +108,7 @@ describe('Api', function () {
     })
 
     sinon.stub(api, 'fetch').resolves({
+      ok: true,
       status: 200,
       json: () => {
         return Promise.resolve({ data: 'stuff' })
