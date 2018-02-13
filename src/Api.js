@@ -1,5 +1,6 @@
 /* global atob, btoa */
 
+const EventEmitter = require('eventemitter2')
 const { capitalizeWord, verifyRequired } = require('@bowtie/utils')
 
 /**
@@ -56,13 +57,15 @@ const defaults = {
 /**
  * Api class to handle all interactions with backend
  */
-class Api {
+class Api extends EventEmitter {
   /**
    * Constructor for an Api object
    * @constructor
    * @param {ApiSettings} settings - Settings to create api instance
    */
   constructor (settings) {
+    super()
+
     this.settings = Object.assign({}, defaults, settings)
 
     // Validate this API instance
@@ -310,9 +313,19 @@ class Api {
         this.fetch(this.buildUrl(path), callOptions)
           // Convert response body to JSON (should trigger catch if fails)
           .then(response => {
-            // this._debug(response);
+            this._debug(response)
 
-            return response.json()
+            return response.json().then(data => {
+              this.emit(response.status.toString(), data, response);
+
+              if (/2\d\d/.test(response.status)) {
+                this.emit('success', data, response)
+              } else {
+                this.emit('error', data, response)
+              }
+              
+              return data
+            })
           })
 
           // After converting to JSON, resolve the callRoute() Promise with the returned data
