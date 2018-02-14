@@ -315,12 +315,18 @@ class Api extends EventEmitter {
           .then(response => {
             this._debug(response)
 
-            this.emit(response.status.toString(), response)
+            if (this.eventNames().includes(response.status.toString())) {
+              this.emit(response.status.toString(), response)
+            }
 
             if (/2\d\d/.test(response.status)) {
-              this.emit('success', response)
+              if (this.eventNames().includes('success')) {
+                this.emit('success', response)
+              }
             } else {
-              this.emit('error', response)
+              if (this.eventNames().includes('error')) {
+                this.emit('error', response)
+              }
             }
 
             if (response.ok) {
