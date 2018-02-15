@@ -110,6 +110,48 @@ class Api extends EventEmitter {
 
     // API version (in case future versions are released, this is easy to change)
     this.version = this.settings.version
+
+    this.middlewares = []
+  }
+
+  /**
+   * Register middleware
+   * @param {function} fn - Middleware function (must resolve with response)
+   */
+  use (fn) {
+    this.middlewares.push(fn)
+  }
+
+  /**
+   * Process middleware chain
+   * @param {object} response - Fetch response to be passed through middleware chain
+   */
+  handleMiddlewares (response) {
+    return this.middlewares.reduce((promiseChain, currentTask) => {
+      return promiseChain.then(currentTask)
+    }, Promise.resolve(response))
+  }
+
+  /**
+   * Process event emitters for response
+   * @param {object} response - Fetch response to trigger events
+   */
+  handleEvents (response) {
+    if (this.eventNames().includes(response.status.toString())) {
+      this.emit(response.status.toString(), response)
+    }
+
+    if (/2\d\d/.test(response.status)) {
+      if (this.eventNames().includes('success')) {
+        this.emit('success', response)
+      }
+    } else {
+      if (this.eventNames().includes('error')) {
+        this.emit('error', response)
+      }
+    }
+
+    return Promise.resolve(response)
   }
 
   /**
@@ -311,23 +353,10 @@ class Api extends EventEmitter {
 
         // Call fetch for the full request URL (using buildUrl function and merged callOptions object)
         this.fetch(this.buildUrl(path), callOptions)
-          // Convert response body to JSON (should trigger catch if fails)
+          .then(this.handleMiddlewares.bind(this))
+          .then(this.handleEvents.bind(this))
           .then(response => {
             this._debug(response)
-
-            if (this.eventNames().includes(response.status.toString())) {
-              this.emit(response.status.toString(), response)
-            }
-
-            if (/2\d\d/.test(response.status)) {
-              if (this.eventNames().includes('success')) {
-                this.emit('success', response)
-              }
-            } else {
-              if (this.eventNames().includes('error')) {
-                this.emit('error', response)
-              }
-            }
 
             if (response.ok) {
               resolve(response)
