@@ -387,7 +387,7 @@ class Api extends EventEmitter {
    * @param {object} [headers] - Request headers
    * @returns {Promise<object>} - Returns promise with response data
    */
-  get (path, headers = {}) {
+  get (path, headers = { 'Content-Type': 'application/json'}) {
     const options = {
       headers
     }
@@ -419,7 +419,7 @@ class Api extends EventEmitter {
    * @param {object} [headers] - Request headers
    * @returns {Promise<object>} - Returns promise with response data
    */
-  post (path, body = {}, headers = {}) {
+  post (path, body = {}, headers = { 'Content-Type': 'application/json'}) {
     const options = {
       method: 'POST',
       body: JSON.stringify(body),
@@ -454,7 +454,7 @@ class Api extends EventEmitter {
    * @param {object} [headers] - Request headers
    * @returns {Promise<object>} - Returns promise with response data
    */
-  put (path, body = {}, headers = {}) {
+  put (path, body = {}, headers = { 'Content-Type': 'application/json'}) {
     const options = {
       method: 'PUT',
       body: JSON.stringify(body),
@@ -483,7 +483,7 @@ class Api extends EventEmitter {
    * @param {object} [headers] - Request headers
    * @returns {Promise<object>} - Returns promise with response data
    */
-  delete (path, body = {}, headers = {}) {
+  delete (path, body = {}, headers = { 'Content-Type': 'application/json'}) {
     const options = {
       method: 'DELETE',
       headers
