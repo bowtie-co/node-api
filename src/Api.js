@@ -384,11 +384,15 @@ class Api extends EventEmitter {
    *   .catch(err => {
    *     // Something went wrong
    *   })
+   * @param {object} [headers] - Request headers
    * @returns {Promise<object>} - Returns promise with response data
    */
-  get (path) {
+  get (path, headers = {}) {
+    const options = {
+      headers
+    }
     // Return the result (Promise) of callRoute() with the provided path
-    return this.callRoute({ path })
+    return this.callRoute({ path, options })
   }
 
   /**
@@ -412,12 +416,14 @@ class Api extends EventEmitter {
    *   })
    * @param {string} path - Request path
    * @param {object} [body] - Request payload
+   * @param {object} [headers] - Request headers
    * @returns {Promise<object>} - Returns promise with response data
    */
-  post (path, body = {}) {
+  post (path, body = {}, headers = {}) {
     const options = {
       method: 'POST',
-      body: JSON.stringify(body)
+      body: JSON.stringify(body),
+      headers
     }
 
     // Return the result (Promise) of callRoute() with the provided path
@@ -445,12 +451,14 @@ class Api extends EventEmitter {
    *   })
    * @param {string} path - Request path
    * @param {object} [body] - Request payload
+   * @param {object} [headers] - Request headers
    * @returns {Promise<object>} - Returns promise with response data
    */
-  put (path, body = {}) {
+  put (path, body = {}, headers = {}) {
     const options = {
       method: 'PUT',
-      body: JSON.stringify(body)
+      body: JSON.stringify(body),
+      headers
     }
 
     // Return the result (Promise) of callRoute() with the provided path
@@ -472,11 +480,13 @@ class Api extends EventEmitter {
    *   })
    * @param {string} path - Request path
    * @param {object} [body] - Request payload
+   * @param {object} [headers] - Request headers
    * @returns {Promise<object>} - Returns promise with response data
    */
-  delete (path, body = {}) {
+  delete (path, body = {}, headers = {}) {
     const options = {
-      method: 'DELETE'
+      method: 'DELETE',
+      headers
     }
 
     // Return the result (Promise) of callRoute() with the provided path
