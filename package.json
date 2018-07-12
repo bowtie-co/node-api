@@ -38,9 +38,11 @@
   },
   "dependencies": {
     "@bowtie/utils": "^0.1.6",
+    "deepmerge": "^2.1.1",
     "detect-node": "^2.0.3",
     "eventemitter2": "^5.0.1",
-    "node-fetch": "^2.0.0"
+    "node-fetch": "^2.0.0",
+    "qs": "^6.5.2"
   },
   "directories": {
     "test": "test"
