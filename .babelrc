@@ -1,0 +1,9 @@
+{
+  "plugins": [
+    ["module-resolver", {
+      "alias": {
+        "deepmerge": "./node_modules/deepmerge/dist/umd.js"
+      }
+    }]
+  ]
+}
