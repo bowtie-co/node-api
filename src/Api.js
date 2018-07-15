@@ -358,7 +358,7 @@ class Api extends EventEmitter {
 
         if (this.isAuthorized()) {
           if (this.customAuth && this.customAuth.headers) {
-            callOptions.headers = deepMerge(callOptions.headers, this.this.varOrFn(this.customAuth.headers))
+            callOptions.headers = deepMerge(callOptions.headers, this.varOrFn(this.customAuth.headers))
           } else {
             callOptions.headers.Authorization = `${this.settings.authorization} ${this.varOrFn(this.token)}`
           }
