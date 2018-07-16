@@ -38,16 +38,19 @@
   },
   "dependencies": {
     "@bowtie/utils": "^0.1.6",
+    "deepmerge": "^2.1.1",
     "detect-node": "^2.0.3",
     "eventemitter2": "^5.0.1",
-    "node-fetch": "^2.0.0"
+    "node-fetch": "^2.0.0",
+    "qs": "^6.5.2"
   },
   "directories": {
     "test": "test"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
-    "babel-preset-env": "^1.6.1",
+    "babel-plugin-module-resolver": "^3.1.1",
+    "babel-preset-env": "^1.7.0",
     "chai": "^4.1.2",
     "jsdoc": "^3.5.5",
     "minami": "^1.2.3",

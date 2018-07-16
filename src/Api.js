@@ -1,5 +1,7 @@
 /* global atob, btoa */
 
+// const queryString = require('qs')
+const deepMerge = require('deepmerge')
 const EventEmitter = require('eventemitter2')
 const { capitalizeWord, verifyRequired } = require('@bowtie/utils')
 
@@ -51,7 +53,8 @@ const defaults = {
 /**
  * Auth types
  *  - Basic
- *  - Token
+ *  - Bearer
+ *  - Custom
  */
 
 /**
@@ -206,7 +209,11 @@ class Api extends EventEmitter {
    * @returns {boolean} - If this API instance has `settings.authorization` set and a valid token
    */
   isAuthorized () {
-    return (this.settings.authorization !== 'None' && this.hasValidToken())
+    if (this.settings.authorization === 'Custom' && this.customAuth && this.customAuth.validate) {
+      return this.customAuth.validate()
+    } else {
+      return (this.settings.authorization !== 'None' && this.hasValidToken())
+    }
   }
 
   /**
@@ -263,11 +270,16 @@ class Api extends EventEmitter {
    * @param {string|function} [args.token] - A token string, or a function to obtain a token value
    * @param {string|function} [args.username] - A username string, or a function to obtain a username value
    * @param {string|function} [args.password] - A password string, or a function to obtain a password value
-   * @throws {Error} - Arguments MUST provide token OR username & password
+   * @param {object|function} [args.headers] - Custom authorization headers object, or a function to obtain them
+   * @param {function} [args.validate] - Custom authorization validation function
+   * @throws {Error} - Arguments MUST provide headers, token OR username & password
    */
   authorize (args) {
     if (args.token) {
       this.token = args.token
+    } else if (this.settings.authorization === 'Custom' && args.headers && args.validate) {
+      verifyRequired(args, { validate: 'function' })
+      this.customAuth = args
     } else if (this.settings.authorization === 'Basic' && args.username && args.password) {
       this.token = () => {
         return this.base64encode(`${this.varOrFn(args.username)}:${this.varOrFn(args.password)}`)
@@ -331,10 +343,9 @@ class Api extends EventEmitter {
    * @param {object} args - Arguments to call api route
    * @param {string} args.path - Relative api path to fetch
    * @param {FetchOptions} [args.options] - Additional fetch options (will be assigned on top of {@link defaults})
-   * @param {object} [args.params] - Query string parameters
    * @returns {Promise<object>} - Returns promise with response data
    */
-  callRoute ({ path, options = {}, params = {} }) {
+  callRoute ({ path, options = {} }) {
     // Return a promise so we can handle async requests in the components
     return new Promise(
       // Promise format using resolve and reject functions
@@ -343,10 +354,14 @@ class Api extends EventEmitter {
         this._debug('Calling route:', path)
 
         // Merge options provided to this method with the default options for this API instance
-        const callOptions = Object.assign({}, this.settings.defaultOptions, options)
+        const callOptions = deepMerge(this.settings.defaultOptions, options)
 
         if (this.isAuthorized()) {
-          callOptions.headers.Authorization = `${this.settings.authorization} ${this.varOrFn(this.token)}`
+          if (this.customAuth && this.customAuth.headers) {
+            callOptions.headers = deepMerge(callOptions.headers, this.varOrFn(this.customAuth.headers))
+          } else {
+            callOptions.headers.Authorization = `${this.settings.authorization} ${this.varOrFn(this.token)}`
+          }
         }
 
         this._debug('callOptions: ', callOptions)
@@ -384,11 +399,12 @@ class Api extends EventEmitter {
    *   .catch(err => {
    *     // Something went wrong
    *   })
+   * @param {object} [options] - Additional fetch options
    * @returns {Promise<object>} - Returns promise with response data
    */
-  get (path) {
+  get (path, options = {}) {
     // Return the result (Promise) of callRoute() with the provided path
-    return this.callRoute({ path })
+    return this.callRoute({ path, options })
   }
 
   /**
@@ -412,13 +428,12 @@ class Api extends EventEmitter {
    *   })
    * @param {string} path - Request path
    * @param {object} [body] - Request payload
+   * @param {object} [options] - Additional fetch options
    * @returns {Promise<object>} - Returns promise with response data
    */
-  post (path, body = {}) {
-    const options = {
-      method: 'POST',
-      body: JSON.stringify(body)
-    }
+  post (path, body = {}, options = {}) {
+    options.method = 'POST'
+    options.body = JSON.stringify(body)
 
     // Return the result (Promise) of callRoute() with the provided path
     return this.callRoute({ path, options })
@@ -445,13 +460,12 @@ class Api extends EventEmitter {
    *   })
    * @param {string} path - Request path
    * @param {object} [body] - Request payload
+   * @param {object} [options] - Additional fetch options
    * @returns {Promise<object>} - Returns promise with response data
    */
-  put (path, body = {}) {
-    const options = {
-      method: 'PUT',
-      body: JSON.stringify(body)
-    }
+  put (path, body = {}, options = {}) {
+    options.method = 'PUT'
+    options.body = JSON.stringify(body)
 
     // Return the result (Promise) of callRoute() with the provided path
     return this.callRoute({ path, options })
@@ -471,13 +485,11 @@ class Api extends EventEmitter {
    *     // Something went wrong
    *   })
    * @param {string} path - Request path
-   * @param {object} [body] - Request payload
+   * @param {object} [options] - Additional fetch options
    * @returns {Promise<object>} - Returns promise with response data
    */
-  delete (path, body = {}) {
-    const options = {
-      method: 'DELETE'
-    }
+  delete (path, options = {}) {
+    options.method = 'DELETE'
 
     // Return the result (Promise) of callRoute() with the provided path
     return this.callRoute({ path, options })
