@@ -24,6 +24,7 @@ JavaScript utilities and helpers
 - [Authorization](#authorization)
   - [Basic Auth](#basic-auth)
   - [Bearer Token](#bearer-token)
+  - [Custom Auth](#custom-auth)
 - [Ignore Security](#ignore-security)
 - [Enable Debug Logs](#enable-debug-logs)
 
@@ -124,7 +125,7 @@ baseUrl = `${api.root}/${api.stage}/${api.prefix}/${api.version}`;
 // Create api instance
 const api = new Api({
   root: 'api.example.com', // Will default to https:// if no protocol is provided here
-  authorization: 'Basic'   // Specify authorization type for this api
+  authorization: 'Basic'   // Specify Basic authorization type for this api
 })
 
 // Authorize api for basic auth with username & password
@@ -140,7 +141,7 @@ api.authorize({
 // Create api instance
 const api = new Api({
   root: 'api.example.com', // Will default to https:// if no protocol is provided here
-  authorization: 'Bearer'  // Specify authorization type for this api
+  authorization: 'Bearer'  // Specify Bearer authorization type for this api
 })
 
 // Authorize with static token value
@@ -151,6 +152,56 @@ api.authorize({
 // Authorize with dynamic token function
 api.authorize({
   token: () => localStorage.getItem('access_token')
+})
+```
+
+#### Custom Auth
+
+```javascript
+// Create api instance
+const api = new Api({
+  root: 'api.example.com', // Will default to https:// if no protocol is provided here
+  authorization: 'Custom'  // Specify Custom authorization type for this api
+})
+
+// Authorize with static headers
+api.authorize({
+  headers: {
+    'token': 'abc123'
+  },
+  validate: () => {
+    // Function to validate the custom auth, returns true/false
+    return true
+  }
+})
+
+// Authorize with dynamic headers
+api.authorize({
+  token: () => ({
+    'token': localStorage.getItem('access_token'),
+    'uid': localStorage.getItem('uid')
+  }),
+  validate: () => {
+    // Function to validate the custom auth, returns true/false
+    return true
+  }
+})
+```
+
+Example using the [j-toker](https://github.com/lynndylanhurley/j-toker) package with headers from [devise_token_auth](https://github.com/lynndylanhurley/devise_token_auth)
+
+```javascript
+const Auth = require('j-toker')
+
+// Configure j-toker apiUrl to match api.baseUrl()
+Auth.configure({
+  apiUrl: api.baseUrl()
+})
+
+// Authorize with custom headers that retrieve authHeaders from j-toker "Auth" instance
+api.authorize({
+  headers: () => Auth.retrieveData('authHeaders'),
+  validate: () => Auth.user.signedIn
 })
 ```
 
