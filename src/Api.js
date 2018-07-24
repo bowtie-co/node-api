@@ -1,7 +1,7 @@
 /* global atob, btoa */
 
 // const queryString = require('qs')
-const deepMerge = require('deepmerge')
+import merge from 'deepmerge';
 const EventEmitter = require('eventemitter2')
 const { capitalizeWord, verifyRequired } = require('@bowtie/utils')
 
@@ -354,11 +354,11 @@ class Api extends EventEmitter {
         this._debug('Calling route:', path)
 
         // Merge options provided to this method with the default options for this API instance
-        const callOptions = deepMerge(this.settings.defaultOptions, options)
+        const callOptions = merge(this.settings.defaultOptions, options)
 
         if (this.isAuthorized()) {
           if (this.customAuth && this.customAuth.headers) {
-            callOptions.headers = deepMerge(callOptions.headers, this.varOrFn(this.customAuth.headers))
+            callOptions.headers = merge(callOptions.headers, this.varOrFn(this.customAuth.headers))
           } else {
             callOptions.headers.Authorization = `${this.settings.authorization} ${this.varOrFn(this.token)}`
           }
@@ -506,4 +506,4 @@ class Api extends EventEmitter {
   }
 }
 
-module.exports = Api
+export default Api
