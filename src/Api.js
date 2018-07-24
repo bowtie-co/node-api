@@ -1,7 +1,7 @@
 /* global atob, btoa */
 
 // const queryString = require('qs')
-import merge from 'deepmerge';
+import merge from 'deepmerge'
 const EventEmitter = require('eventemitter2')
 const { capitalizeWord, verifyRequired } = require('@bowtie/utils')
 
@@ -506,4 +506,4 @@ class Api extends EventEmitter {
   }
 }
 
-export default Api
+module.exports = Api
