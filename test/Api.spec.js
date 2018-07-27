@@ -128,6 +128,37 @@ describe('Api', function () {
     })
   })
 
+  it('should support dynamic default headers', function () {
+    const headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer supersecret',
+      'X-Custom-Header': 'A fancy custom value'
+    }
+
+    const api = new Api({
+      root,
+      defaultOptions: {
+        headers: () => headers
+      }
+    })
+
+    sinon.stub(api, 'fetch').resolves({
+      ok: true,
+      status: 200,
+      json: () => {
+        return Promise.resolve({ data: 'stuff' })
+      }
+    })
+
+    return api.get('path').then((data) => {
+      const options = {
+        method: 'GET',
+        headers
+      }
+      expect(api.fetch).to.have.been.calledWithExactly(`${root}/path`, options)
+    })
+  })
+
   it('should throw if missing required settings', function () {
     const attempt = () => {
       const api = new Api()
