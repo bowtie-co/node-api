@@ -299,10 +299,7 @@ class Api extends EventEmitter {
       verbose: 'boolean',
       secureOnly: 'boolean',
       authorization: 'string',
-      defaultOptions: {
-        method: 'string',
-        headers: 'object'
-      }
+      defaultOptions: 'object'
     }
 
     verifyRequired(this.settings, schema)
