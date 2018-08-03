@@ -131,15 +131,19 @@ describe('Api', function () {
   it('should support dynamic default headers', function () {
     const headers = {
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer supersecret',
       'X-Custom-Header': 'A fancy custom value'
     }
 
     const api = new Api({
       root,
+      authorization: 'Bearer',
       defaultOptions: {
         headers: () => headers
       }
+    })
+
+    api.authorize({
+      token: () => 'supersecret'
     })
 
     sinon.stub(api, 'fetch').resolves({
@@ -153,7 +157,7 @@ describe('Api', function () {
     return api.get('path').then((data) => {
       const options = {
         method: 'GET',
-        headers
+        headers: Object.assign({}, headers, { 'Authorization': 'Bearer supersecret' })
       }
       expect(api.fetch).to.have.been.calledWithExactly(`${root}/path`, options)
     })

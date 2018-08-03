@@ -353,6 +353,8 @@ class Api extends EventEmitter {
         // Merge options provided to this method with the default options for this API instance
         const callOptions = merge(this.settings.defaultOptions, options)
 
+        callOptions.headers = this.varOrFn(callOptions.headers)
+
         if (this.isAuthorized()) {
           if (this.customAuth && this.customAuth.headers) {
             callOptions.headers = merge(callOptions.headers, this.varOrFn(this.customAuth.headers))
@@ -360,8 +362,6 @@ class Api extends EventEmitter {
             callOptions.headers.Authorization = `${this.settings.authorization} ${this.varOrFn(this.token)}`
           }
         }
-
-        callOptions.headers = this.varOrFn(callOptions.headers)
 
         this._debug('callOptions: ', callOptions)
 
