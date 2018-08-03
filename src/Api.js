@@ -69,7 +69,7 @@ class Api extends EventEmitter {
   constructor (settings) {
     super()
 
-    this.settings = Object.assign({}, defaults, settings)
+    this.settings = merge(defaults, settings)
 
     // Validate this API instance
     this.validate()
@@ -299,10 +299,7 @@ class Api extends EventEmitter {
       verbose: 'boolean',
       secureOnly: 'boolean',
       authorization: 'string',
-      defaultOptions: {
-        method: 'string',
-        headers: 'object'
-      }
+      defaultOptions: 'object'
     }
 
     verifyRequired(this.settings, schema)
@@ -363,6 +360,8 @@ class Api extends EventEmitter {
             callOptions.headers.Authorization = `${this.settings.authorization} ${this.varOrFn(this.token)}`
           }
         }
+
+        callOptions.headers = this.varOrFn(callOptions.headers)
 
         this._debug('callOptions: ', callOptions)
 
