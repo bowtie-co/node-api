@@ -102,6 +102,37 @@ describe('Api', function () {
     })
   })
 
+  describe('#patch', function () {
+    const api = new Api({
+      root
+    })
+
+    sinon.stub(api, 'fetch').resolves({
+      ok: true,
+      status: 200,
+      json: () => {
+        return Promise.resolve({ data: 'stuff' })
+      }
+    })
+
+    it('should call fetch PATCH', function () {
+      const body = {
+        data: 'body'
+      }
+
+      return api.patch('path', body).then((data) => {
+        const options = {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(body)
+        }
+        expect(api.fetch).to.have.been.calledWithExactly(`${root}/path`, options)
+      })
+    })
+  })
+
   describe('#delete', function () {
     const api = new Api({
       root
@@ -119,6 +150,29 @@ describe('Api', function () {
       return api.delete('path').then((data) => {
         const options = {
           method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+        expect(api.fetch).to.have.been.calledWithExactly(`${root}/path`, options)
+      })
+    })
+  })
+
+  describe('#head', function () {
+    const api = new Api({
+      root
+    })
+
+    sinon.stub(api, 'fetch').resolves({
+      ok: true,
+      status: 200
+    })
+
+    it('should call fetch HEAD', function () {
+      return api.head('path').then((data) => {
+        const options = {
+          method: 'HEAD',
           headers: {
             'Content-Type': 'application/json'
           }

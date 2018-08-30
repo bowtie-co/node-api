@@ -471,6 +471,38 @@ class Api extends EventEmitter {
   }
 
   /**
+   * Query API route for `path` using the PATCH method with a body
+   * @async
+   * @example <caption>Example usage of patch.</caption>
+   * var api = new Api({ root: 'api.example.com' })
+   *
+   * var payload = {
+   *   todo: {
+   *     name: 'new name (patched)'
+   *   }
+   * }
+   *
+   * api.patch('todos/1', payload)
+   *   .then(resp => {
+   *     // resp = response from PATCH https://api.example.com/todos/1
+   *   })
+   *   .catch(err => {
+   *     // Something went wrong
+   *   })
+   * @param {string} path - Request path
+   * @param {object} [body] - Request payload
+   * @param {object} [options] - Additional fetch options
+   * @returns {Promise<object>} - Returns promise with response data
+   */
+  patch (path, body = {}, options = {}) {
+    options.method = 'PATCH'
+    options.body = JSON.stringify(body)
+
+    // Return the result (Promise) of callRoute() with the provided path
+    return this.callRoute({ path, options })
+  }
+
+  /**
    * Query API route for `path` using the DELETE method with a body
    * @async
    * @example <caption>Example usage of delete.</caption>
@@ -489,6 +521,37 @@ class Api extends EventEmitter {
    */
   delete (path, options = {}) {
     options.method = 'DELETE'
+
+    // Return the result (Promise) of callRoute() with the provided path
+    return this.callRoute({ path, options })
+  }
+
+  /**
+   * Query API route for `path` using the HEAD method (no response body)
+   * @async
+   * @example <caption>Example usage of head.</caption>
+   * var api = new Api({ root: 'api.example.com' })
+   *
+   * api.head('todos', payload)
+   *   .then(resp => {
+   *     // response from HEAD https://api.example.com/todos (no response body)
+   *
+   *     // resp = {
+   *     //   url: 'https://api.example.com/todos',
+   *     //   status: 200,
+   *     //   statusText: 'OK',
+   *     //   headers: { ... }
+   *     // }
+   *   })
+   *   .catch(err => {
+   *     // Something went wrong
+   *   })
+   * @param {string} path - Request path
+   * @param {object} [options] - Additional fetch options
+   * @returns {Promise<object>} - Returns promise with response data
+   */
+  head (path, options = {}) {
+    options.method = 'HEAD'
 
     // Return the result (Promise) of callRoute() with the provided path
     return this.callRoute({ path, options })
