@@ -217,6 +217,93 @@ describe('Api', function () {
     })
   })
 
+  it('should support custom auth headers', function () {
+    const headers = {
+      'Content-Type': 'application/json',
+      'X-Custom-Header': 'A fancy custom value'
+    }
+
+    const api = new Api({
+      root,
+      authorization: 'Custom'
+    })
+
+    api.authorize({
+      headers: () => headers,
+      validate: () => true
+    })
+
+    sinon.stub(api, 'fetch').resolves({
+      ok: true,
+      status: 200,
+      json: () => {
+        return Promise.resolve({ data: 'stuff' })
+      }
+    })
+
+    return api.get('path').then((data) => {
+      const options = {
+        method: 'GET',
+        headers
+      }
+      expect(api.fetch).to.have.been.calledWithExactly(`${root}/path`, options)
+    })
+  })
+
+  it('should reject on error response', function () {
+    const api = new Api({
+      root
+    })
+
+    sinon.stub(api, 'fetch').resolves({
+      ok: false,
+      status: 500
+    })
+
+    return api.get('path').then(() => {
+      // No-op
+    }).catch(resp => {
+      expect(resp.ok).to.equal(false)
+      expect(resp.status).to.equal(500)
+    })
+  })
+
+  it('should sanitize path', function () {
+    const api = new Api({
+      root
+    })
+
+    sinon.stub(api, 'fetch').resolves({
+      ok: true,
+      status: 200
+    })
+
+    return api.get('/path').then(() => {
+      const options = {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+      expect(api.fetch).to.have.been.calledWithExactly(`${root}/path`, options)
+    })
+  })
+
+  it('should throw if invalid args to authorize', function () {
+    const attempt = () => {
+      const api = new Api({
+        root,
+        authorization: 'Stuff'
+      })
+
+      api.authorize({
+        things: 'more stuff'
+      })
+    }
+
+    expect(attempt).to.throw()
+  })
+
   it('should throw if missing required settings', function () {
     const attempt = () => {
       const api = new Api()
