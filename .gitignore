@@ -5,3 +5,5 @@ npm-debug.log
 tmp
 lib
 .local-storage*
+.nyc_output
+cc-test-reporter
