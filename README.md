@@ -1,3 +1,6 @@
+[![Maintainability](https://api.codeclimate.com/v1/badges/974bf224f3870818bc16/maintainability)](https://codeclimate.com/github/bowtie-co/node-api/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/974bf224f3870818bc16/test_coverage)](https://codeclimate.com/github/bowtie-co/node-api/test_coverage)
+
 [![build status](https://img.shields.io/travis/bowtie-co/node-api.svg?style=flat-square)](https://travis-ci.org/bowtie-co/node-api)
 [![npm version](https://img.shields.io/npm/v/@bowtie/api.svg?style=flat-square)](https://www.npmjs.com/package/@bowtie/api)
 [![node version](https://img.shields.io/node/v/@bowtie/api.svg?style=flat-square)](https://nodejs.org)
