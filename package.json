@@ -12,10 +12,12 @@
     "build": "babel src -d lib --presets env",
     "lint": "standard",
     "lint:fix": "standard --fix",
-    "test": "npm run lint && npm run build && nyc --reporter=lcov mocha test/**/*.spec.js",
+    "test": "npm run lint && npm run build && nyc mocha test/**/*.spec.js && npm run nyc:report",
     "test:watch": "mocha test/**/*.spec.js --watch",
     "preversion": "npm test && npm run doc:commit",
-    "postversion": "git push --follow-tags"
+    "postversion": "git push --follow-tags",
+    "nyc:check": "nyc check-coverage --lines 95 --functions 95 --branches 95",
+    "nyc:report": "nyc report --reporter=lcov"
   },
   "keywords": [
     "bowtie",
