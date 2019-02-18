@@ -182,6 +182,40 @@ describe('Api', function () {
     })
   })
 
+  it('should support basic auth', function () {
+    const api = new Api({
+      root,
+      authorization: 'Basic'
+    })
+
+    const username = 'somebody'
+    const password = 'p@ssw0rd'
+
+    api.authorize({
+      username,
+      password
+    })
+
+    sinon.stub(api, 'fetch').resolves({
+      ok: true,
+      status: 200,
+      json: () => {
+        return Promise.resolve({ data: 'stuff' })
+      }
+    })
+
+    return api.get('path').then((data) => {
+      const options = {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Basic ' + api.base64encode(`${username}:${password}`)
+        }
+      }
+      expect(api.fetch).to.have.been.calledWithExactly(`${root}/path`, options)
+    })
+  })
+
   it('should support dynamic default headers', function () {
     const headers = {
       'Content-Type': 'application/json',
@@ -362,5 +396,36 @@ describe('Api', function () {
     })
 
     expect(api.baseUrl()).to.eq('https://api.example.com/dev/api/v1/')
+  })
+
+  it('should log debug output if verbose', function () {
+    const api = new Api({
+      root,
+      verbose: true
+    })
+
+    sinon.stub(api, 'fetch').resolves({
+      ok: true,
+      status: 200,
+      json: () => {
+        return Promise.resolve({ data: 'stuff' })
+      }
+    })
+
+    const cstub = sinon.stub(console, 'log')
+
+    return api.get('path').then((data) => {
+      const options = {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+
+      expect(api.fetch).to.have.been.calledWithExactly(`${root}/path`, options)
+      expect(console.log).to.have.been.calledAfter(api.fetch)
+
+      cstub.restore()
+    })
   })
 })
